@@ -9,12 +9,13 @@ pygame.init() #intializes pygame
 
 # background sound
 mixer.music.load("background.wav")
-mixer.music.play(-1) #-1 loops music
+mixer.music.play(-1) #-1 loops music    
 
-num_of_enemies = 8
-speed = 0.3
+num_of_enemies = 16
+speed = 0.1
 
 gameOver = False
+playing = False
 
 screen = pygame.display.set_mode((800,600)) #creates the screen
 
@@ -23,7 +24,7 @@ screen = pygame.display.set_mode((800,600)) #creates the screen
 score_value = 0
 font = pygame.font.Font("ka1.ttf",32)
 font2 = pygame.font.Font("data-latin.ttf",32)
-font3 = pygame.font.Font("data-latin.ttf",64)
+font3 = pygame.font.Font("data-latin.ttf",40)
 
 textX = 10
 textY = 10
@@ -93,15 +94,16 @@ def fire_bullet(x,y):
     screen.blit(bulletImg,(x+16,y+10))
 
 def startGame():
-    #font variable render
     font = pygame.font.Font("ka1.ttf",45)
     myText = font.render("CHOOSE YOUR DIFFICULTY:",True,(25,100,255))
     screen.blit(myText,(18,150))
-    myText = font3.render("1) EASY 2) MEDIUM 3) HARD",True,(25,25,255))
-    screen.blit(myText,(12.5,250))
+    myText = font3.render("1) EASY 2) MEDIUM 3) HARD 4) EXTREME",True,(25,25,255))
+    screen.blit(myText,(50,250))
 
 
 def restartGame():
+    global playing
+    playing = False
     mixer.music.load("background.wav")
     mixer.music.play(-1) #-1 loops music
     for i in range(num_of_enemies):
@@ -138,6 +140,11 @@ while running:
                 num_of_enemies = 8
                 speed = 0.3
                 gameOn = True
+            if event.key == pygame.K_4:
+                diffMode = 4
+                num_of_enemies = 8
+                speed = 0.3
+                gameOn = True
             if (event.key == pygame.K_SPACE or event.key == pygame.K_UP) and bulletState == "ready":
                 bullet_sound = mixer.Sound("laser.wav")
                 bullet_sound.play()
@@ -166,9 +173,13 @@ while running:
         for i in range(num_of_enemies):
 
             #Game over
-            if enemyYcord[i] > 360:
+            if enemyYcord[i] > 360: #def 360
                 for j in range(num_of_enemies):
                     enemyYcord[j] = 2000
+                if playing == False:
+                    playing = True
+                    sound2 = mixer.Sound("game_over.wav")
+                    sound2.play()
                 game_over()
                 break
 
@@ -190,6 +201,15 @@ while running:
                 bulletYcord = 440
                 bulletState = "ready"
                 score_value += 1
+                sound1 = mixer.Sound("harderEnemies.wav")
+                if score_value == 50 and diffMode == 4:
+                    num_of_enemies += 4
+                    speed += 0.2
+                    sound1.play()
+                elif score_value == 100 and diffMode == 4:
+                    num_of_enemies += 4
+                    speed += 0.3
+                    sound1.play()
                 enemyXcord[i] = random.randint(0,736)
                 enemyYcord[i] = random.randint(50,150)
 
